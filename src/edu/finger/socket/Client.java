@@ -7,11 +7,9 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
-import edu.finger.Utils.Hello;
 import edu.finger.Utils.JsonHelper;
 import edu.finger.Utils.Result;
 
@@ -33,18 +31,17 @@ public class Client {
 			is = socket.getInputStream();
 			br = new BufferedReader(new InputStreamReader(is));
 			finger = Result.outFinger2();
-			//发送c的hello
+			// 发送c的hello
 			bw.write(JsonHelper.cHelloToJson());
 			bw.newLine();
 			bw.flush();
-			//得到s的hello
+			// 得到s的hello
 			info = br.readLine();
 			System.out.println(info);
-			//得到存入cRcvHello
+			// 得到存入cRcvHello
 			JsonHelper.cRcvToHello(info);
-			
-			info=br.readLine();
-			
+
+			info = br.readLine();
 
 		} catch (UnknownHostException e) {
 			e.printStackTrace();
