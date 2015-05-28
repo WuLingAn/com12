@@ -10,7 +10,7 @@ import java.io.OutputStreamWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-import edu.finger.RSA.AddRSA;
+import edu.finger.Security.AddRSA;
 import edu.finger.Utils.JsonHelper;
 import edu.finger.Utils.Result;
 

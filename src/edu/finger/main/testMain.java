@@ -2,7 +2,7 @@ package edu.finger.main;
 
 import com.google.gson.Gson;
 
-import edu.finger.RSA.AddRSA;
+import edu.finger.Security.AddRSA;
 import edu.finger.Utils.Hello;
 
 public class testMain {

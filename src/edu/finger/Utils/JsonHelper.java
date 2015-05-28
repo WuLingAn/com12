@@ -2,7 +2,7 @@ package edu.finger.Utils;
 
 import com.google.gson.Gson;
 
-import edu.finger.RSA.AddRSA;
+import edu.finger.Security.AddRSA;
 
 public class JsonHelper {
 

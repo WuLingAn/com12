@@ -1,4 +1,4 @@
-package edu.finger.RSA;
+package edu.finger.Security;
 
 import java.security.InvalidKeyException;
 import java.security.KeyFactory;
