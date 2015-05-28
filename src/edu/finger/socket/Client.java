@@ -33,15 +33,17 @@ public class Client {
 			is = socket.getInputStream();
 			br = new BufferedReader(new InputStreamReader(is));
 			finger = Result.outFinger2();
-			//发送c的hello
+			//鍙戦�乧鐨刪ello
 			bw.write(JsonHelper.cHelloToJson());
 			bw.newLine();
 			bw.flush();
-			//得到s的hello
+			//寰楀埌s鐨刪ello
 			info = br.readLine();
 			System.out.println(info);
-			//得到存入cRcvHello
+			//寰楀埌瀛樺叆cRcvHello
 			JsonHelper.cRcvToHello(info);
+			
+			info=br.readLine();
 			
 
 		} catch (UnknownHostException e) {

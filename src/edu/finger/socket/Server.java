@@ -35,7 +35,7 @@ public class Server {
 			is = socket.getInputStream();
 			br = new BufferedReader(new InputStreamReader(is));
 
-			finger = Result.outFinger1();// 服务器端的出拳放在这
+			finger = Result.outFinger1();// 鏈嶅姟鍣ㄧ鐨勫嚭鎷虫斁鍦ㄨ繖
 			bw.write(JsonHelper.sHelloToJson());
 			bw.newLine();
 			bw.flush();
@@ -64,24 +64,24 @@ public class Server {
 
 	public static String com(String finger, String info) {
 		if (finger.equals(info))
-			return "平局";
+			return "骞冲眬";
 		if ("Paper".equals(finger)) {
 			if ("Rock".equals(info))
-				return "赢了";
+				return "璧簡";
 			else if ("Scissors".equals(info))
-				return "输了";
+				return "杈撲簡";
 		}
 		if ("Rock".equals(finger)) {
 			if ("Scissors".equals(info))
-				return "赢了";
+				return "璧簡";
 			else if ("Paper".equals(info))
-				return "输了";
+				return "杈撲簡";
 		}
 		if ("Scissors".equals(finger)) {
 			if ("Paper".equals(info))
-				return "赢了";
+				return "璧簡";
 			else if ("Rock".equals(info))
-				return "输了";
+				return "杈撲簡";
 		}
 		return "no";
 	}
