@@ -6,7 +6,6 @@ import java.security.SecureRandom;
 
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
-import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
@@ -48,7 +47,7 @@ public class addAES {
 			// 加密
 			cipher.init(Cipher.ENCRYPT_MODE, key);
 			byte[] result = cipher.doFinal(src.getBytes());
-			// System.out.println(Base64.encode(result));
+			//System.out.println(Base64.encode(result));
 			return Base64.encode(result);
 		} catch (Exception e) {
 			e.printStackTrace();

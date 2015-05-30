@@ -24,7 +24,6 @@ public class SecurityHelper {
 	// 对加密后的加密得到sign
 	public static String signToSend(String toSendPlay) {
 		return useRSA(toSendPlay);
-
 	}
 
 	// 使用收到的publickey解密
