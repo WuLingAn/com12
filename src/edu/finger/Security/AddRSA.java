@@ -12,11 +12,14 @@ import java.security.interfaces.RSAPublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
+import java.util.Arrays;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
+
+import jdk.nashorn.internal.ir.LiteralNode.ArrayLiteralNode.ArrayUnit;
 
 import com.sun.org.apache.xml.internal.security.exceptions.Base64DecodingException;
 import com.sun.org.apache.xml.internal.security.utils.Base64;
@@ -29,8 +32,7 @@ public class AddRSA {
 	RSAPrivateKey rsaPrivateKey;
 	KeyFactory keyFactory;
 	Cipher cipher;
-	
-	
+
 	public AddRSA() {
 		try {
 			keyFactory = KeyFactory.getInstance("RSA");
@@ -60,15 +62,24 @@ public class AddRSA {
 	}
 
 	public String addSecurity(String src) {
-		byte[] result = null;
+		byte[] result =null;
+		byte[] temp = null;
 		try {
+			byte[] srcBytes = Base64.decode(src);
 			PKCS8EncodedKeySpec pkcs8EncodedKeySpec = new PKCS8EncodedKeySpec(
 					rsaPrivateKey.getEncoded());
 			PrivateKey privateKey = keyFactory
 					.generatePrivate(pkcs8EncodedKeySpec);
 			cipher = Cipher.getInstance("RSA");
 			cipher.init(Cipher.ENCRYPT_MODE, privateKey);
-			result = cipher.doFinal(src.getBytes());
+
+			result = cipher.doFinal(Base64.decode(src));
+
+			for (int i = 0; i < srcBytes.length; i += 64) {
+				System.arraycopy(srcBytes, i, temp, i, i + 64);
+				//未完工。。。。。。
+				result = cipher.doFinal(temp);
+			}
 
 		} catch (NoSuchAlgorithmException e) {
 			e.printStackTrace();
@@ -81,18 +92,18 @@ public class AddRSA {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-			return Base64.encode(result);
-		//return result;
+		return Base64.encode(result);
+		// return result;
 	}
 
-	public String decSecurity(String src,String rcvKey) {
-		byte[] result=null;
+	public String decSecurity(String src, String rcvKey) {
+		byte[] result = null;
 		try {
 			X509EncodedKeySpec x509EncodedKeySpec = new X509EncodedKeySpec(
 					Base64.decode(rcvKey));
-			PublicKey publicKey=keyFactory.generatePublic(x509EncodedKeySpec);
+			PublicKey publicKey = keyFactory.generatePublic(x509EncodedKeySpec);
 			cipher.init(Cipher.DECRYPT_MODE, publicKey);
-			result=cipher.doFinal(Base64.decode(src));
+			result = cipher.doFinal(Base64.decode(src));
 		} catch (InvalidKeySpecException e) {
 			e.printStackTrace();
 		} catch (InvalidKeyException e) {

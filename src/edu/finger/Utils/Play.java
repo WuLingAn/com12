@@ -1,6 +1,5 @@
 package edu.finger.Utils;
 
-import edu.finger.Security.addAES;
 
 /**
  * { "round":当前轮的编号, "play":"出拳字符串经过加密得到的字节流，使用BASE64编码",
@@ -22,8 +21,6 @@ public class Play {
 	 * 使用签名私钥对上述出拳加密数据进行再加密得到的字节流，使用BASE64编码；此字节流经过签名公钥解密可得到上述出拳加密数据
 	 */
 	private String sign;
-
-	private addAES aes;
 
 	public Play(int roundId, String play, String sign) {
 		this.round = roundId;
