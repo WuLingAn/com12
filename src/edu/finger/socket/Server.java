@@ -12,6 +12,7 @@ import java.net.Socket;
 
 import edu.finger.Security.AddRSA;
 import edu.finger.Utils.JsonHelper;
+import edu.finger.Utils.Play;
 import edu.finger.Utils.Result;
 
 public class Server {
@@ -23,7 +24,7 @@ public class Server {
 		BufferedReader br = null;
 		BufferedWriter bw = null;
 		String finger = null;
-		AddRSA addRSA=new AddRSA();
+		Play play;
 
 		try {
 			serverSocket = new ServerSocket(9000);
@@ -40,12 +41,14 @@ public class Server {
 			bw.flush();
 
 			info = br.readLine();
-			System.out.println(info);
 			JsonHelper.sRcvToHello(info);
 			
-			bw.write(addRSA.addSecurity("zhangwei"));
-			bw.newLine();
-			bw.flush();
+			for (int i = 0; i < 1000; i++) {
+				//finger
+				//bw.write("");
+				bw.newLine();
+				bw.flush();
+			}
 			
 		} catch (Exception e) {
 			e.printStackTrace();
