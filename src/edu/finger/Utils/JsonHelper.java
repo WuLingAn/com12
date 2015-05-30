@@ -21,6 +21,7 @@ public class JsonHelper {
 	public static AddRSA SaddRSA=new AddRSA();
 	public static AddRSA CaddRSA=new AddRSA();
 	
+	
 
 	//将对象封装成json串
 	public static String toJson(Object object) {
@@ -47,7 +48,7 @@ public class JsonHelper {
 	//将服务器端要发送的hello数据进行json封装，【服务器端调用】
 	public static String sHelloToJson() {
 		sHello=new Hello("com12-S", SaddRSA.strRasPublicKey);
-		System.out.println("shello:"+sHello.getPublicKey());
+		//System.out.println("shello:"+sHello.getPublicKey());
 		return gson.toJson(sHello);
 	}
 	
@@ -78,11 +79,16 @@ public class JsonHelper {
 	//将客户端要发送的play数据进行json封装，【客户端调用】
 	public static String cPlaytoJson(){
 		//调用aes算法
+		
 		return gson.toJson(cPlay);
 	}
 	
 	//Play阶段json数据的解析
 	public static Play toPlay(String json){
 		return (Play) gson.fromJson(json, Play.class);
+	}
+
+	public static Hello getsRcvHello() {
+		return sRcvHello;
 	}
 }
