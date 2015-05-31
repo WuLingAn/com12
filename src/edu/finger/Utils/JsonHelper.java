@@ -48,7 +48,7 @@ public class JsonHelper {
 	// 将服务器端要发送的hello数据进行json封装，【服务器端调用】
 	public static String sHelloToJson() {
 		sHello = new Hello("com12-S", SaddRSA.strRasPublicKey);
-		System.out.println("shello:" + sHello.getPublicKey());
+		// System.out.println("shello:" + sHello.getPublicKey());
 		return gson.toJson(sHello);
 	}
 
@@ -61,13 +61,13 @@ public class JsonHelper {
 	// 解析服务器端接收到的paly的json数据，【服务器端调用】
 	public static void sRcvtoPlay(String sRcvJson) {
 		sRcvPlay = toPlay(sRcvJson);
-		// System.out.println("sRcvPlay" + sRcvPlay.getSign());
+		//System.out.println("sRcvPlay:" + sRcvPlay.getSign());
 	}
 
 	// 解析客户端接收到的paly的json数据，【客户端调用】
-	public static void cRcvPlay(String cRcvJson) {
+	public static void cRcvtoPlay(String cRcvJson) {
 		cRcvPlay = toPlay(cRcvJson);
-		// System.out.println("cRcvPlay" + cRcvPlay.getSign());
+		// System.out.println("cRcvPlay:" + cRcvPlay.getSign());
 	}
 
 	// 将服务器端的要发送的paly数据进行json封装，【服务器端调用】
@@ -82,18 +82,11 @@ public class JsonHelper {
 
 	// 将客户端要发送的play数据进行json封装，【客户端调用】
 	public static String cPlaytoJson(int roundId, String src) {
-		try {
-			// 二次加密得到的数据
-			String playToSend = SecurityHelper.playToSend(src);
-			// 三次加密后得到的数据
-			String signToSend = SecurityHelper.signToSend(Base64.encode(Base64
-					.decode(playToSend)));
-			cPlay = new Play(roundId, playToSend, signToSend);
-		} catch (Base64DecodingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
+		// 二次加密得到的数据
+		String playToSend = SecurityHelper.playToSend(src);
+		// 三次加密后得到的数据
+		String signToSend = SecurityHelper.signToSend(playToSend);
+		cPlay = new Play(roundId, playToSend, signToSend);
 		return gson.toJson(cPlay);
 	}
 

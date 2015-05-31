@@ -35,22 +35,32 @@ public class Server {
 			is = socket.getInputStream();
 			br = new BufferedReader(new InputStreamReader(is));
 
-			finger = Result.outFinger1();// 服务器端的出拳放在这
 			bw.write(JsonHelper.sHelloToJson());
 			bw.newLine();
 			bw.flush();
 
 			info = br.readLine();
 			JsonHelper.sRcvToHello(info);
-			
-			for (int i = 0; i < 1000; i++) {
-				//finger
-				//bw.write("");
+
+			for (int i = 1; i <= 1000; i++) {
+				finger = Result.outFinger1();// 服务器端的出拳放在这
+				// finger
+				// bw.write("");
+				// 发送s的play
 				bw.write(JsonHelper.sPlaytoJson(i, finger));
 				bw.newLine();
 				bw.flush();
+
+				// 接收c发送的play
+				info = br.readLine();
+				System.out.println("+++:"+info);
+				JsonHelper.sRcvtoPlay(info);
+				//进行签名判断，当不是对方发送时结束发送
+//				if (!true) {
+//					break;
+//				}
 			}
-			
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {

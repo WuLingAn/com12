@@ -30,7 +30,7 @@ public class Client {
 			bw = new BufferedWriter(new OutputStreamWriter(os));
 			is = socket.getInputStream();
 			br = new BufferedReader(new InputStreamReader(is));
-			finger = Result.outFinger2();
+
 			// 发送c的hello
 			bw.write(JsonHelper.cHelloToJson());
 			bw.newLine();
@@ -41,7 +41,21 @@ public class Client {
 			// 得到存入cRcvHello
 			JsonHelper.cRcvToHello(info);
 
-			info = br.readLine();
+			for (int i = 1; i <= 1000; i++) {
+				finger = Result.outFinger2();
+				// 从s得到play数据
+				info = br.readLine();
+				System.out.println(info);
+				// 得到存入cRcvtoPlay
+				JsonHelper.cRcvtoPlay(info);
+				// 进行签名判断，确定是否是对方发送的数据包
+				if (true) {
+					// 发送c的play
+					bw.write(JsonHelper.cPlaytoJson(i, finger));
+					bw.newLine();
+					bw.flush();
+				}
+			}
 
 		} catch (UnknownHostException e) {
 			e.printStackTrace();
