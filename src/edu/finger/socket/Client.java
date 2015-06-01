@@ -12,7 +12,11 @@ import java.net.UnknownHostException;
 
 import edu.finger.Utils.JsonHelper;
 import edu.finger.Utils.Result;
-
+/**
+ * now ,现在想一想我们得到的play信息和password信息怎么保存和处理
+ * @author zLing
+ *
+ */
 public class Client {
 
 	public static void main(String[] args) {
