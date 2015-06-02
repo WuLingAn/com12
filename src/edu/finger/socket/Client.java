@@ -10,8 +10,10 @@ import java.io.OutputStreamWriter;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
+import edu.finger.Security.addAES;
 import edu.finger.Utils.JsonHelper;
 import edu.finger.Utils.Result;
+import edu.finger.Utils.SecurityHelper;
 /**
  * now ,现在想一想我们得到的play信息和password信息怎么保存和处理
  * @author zLing
@@ -41,24 +43,34 @@ public class Client {
 			bw.flush();
 			// 得到s的hello
 			info = br.readLine();
-			System.out.println(info);
 			// 得到存入cRcvHello
 			JsonHelper.cRcvToHello(info);
 
-			for (int i = 1; i <= 1000; i++) {
+			for (int i = 1; i <= 5; i++) {
+				addAES aes=new addAES();
 				finger = Result.outFinger2();
 				// 从s得到play数据
 				info = br.readLine();
-				System.out.println(info);
 				// 得到存入cRcvtoPlay
 				JsonHelper.cRcvtoPlay(info);
 				// 进行签名判断，确定是否是对方发送的数据包
 				if (true) {
 					// 发送c的play
-					bw.write(JsonHelper.cPlaytoJson(i, finger));
+					bw.write(JsonHelper.cPlaytoJson(i, finger,aes));
 					bw.newLine();
 					bw.flush();
 				}
+				//得到s的password
+				info = br.readLine();
+				JsonHelper.cRcvtoPassoword(info);
+				//发送c的password
+				bw.write(JsonHelper.cPasswordtoJson(i, aes.getAesKey()));
+				bw.newLine();
+				bw.flush();
+				
+				System.out.println(SecurityHelper.DecAll(JsonHelper.getcRcPlay()
+						.getPlay(), JsonHelper.getcRcvPassword().getPassword(),
+						JsonHelper.getcRcvHello().getPublicKey()));
 			}
 
 		} catch (UnknownHostException e) {

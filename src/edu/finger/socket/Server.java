@@ -10,10 +10,10 @@ import java.io.OutputStreamWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-import edu.finger.Security.AddRSA;
+import edu.finger.Security.addAES;
 import edu.finger.Utils.JsonHelper;
-import edu.finger.Utils.Play;
 import edu.finger.Utils.Result;
+import edu.finger.Utils.SecurityHelper;
 
 public class Server {
 	public static void main(String[] args) {
@@ -24,7 +24,6 @@ public class Server {
 		BufferedReader br = null;
 		BufferedWriter bw = null;
 		String finger = null;
-		Play play;
 
 		try {
 			serverSocket = new ServerSocket(9000);
@@ -35,30 +34,46 @@ public class Server {
 			is = socket.getInputStream();
 			br = new BufferedReader(new InputStreamReader(is));
 
+			// 发送s的hello
 			bw.write(JsonHelper.sHelloToJson());
 			bw.newLine();
 			bw.flush();
 
 			info = br.readLine();
 			JsonHelper.sRcvToHello(info);
+			// System.out.println("hello:" + info);
 
-			for (int i = 1; i <= 1000; i++) {
+			for (int i = 1; i <= 5; i++) {
+				// 对称加密工具对象声明位置修改到这
+				addAES aes = new addAES();
 				finger = Result.outFinger1();// 服务器端的出拳放在这
-				// finger
-				// bw.write("");
 				// 发送s的play
-				bw.write(JsonHelper.sPlaytoJson(i, finger));
+				bw.write(JsonHelper.sPlaytoJson(i, finger, aes));
 				bw.newLine();
 				bw.flush();
 
 				// 接收c发送的play
 				info = br.readLine();
-				System.out.println("+++:"+info);
 				JsonHelper.sRcvtoPlay(info);
-				//进行签名判断，当不是对方发送时结束发送
-//				if (!true) {
-//					break;
-//				}
+
+				// 发送s的password
+				bw.write(JsonHelper.sPasswordtoJson(i, aes.getAesKey()));
+				bw.newLine();
+				bw.flush();
+
+				// 接收c发送的password
+				info = br.readLine();
+				JsonHelper.sRcvtoPassoword(info);
+
+				// 尝试解密
+				System.out.println(SecurityHelper.DecAll(JsonHelper
+						.getsRcPlay().getPlay(), JsonHelper.getsRcvPassword()
+						.getPassword(), JsonHelper.getsRcvHello()
+						.getPublicKey()));
+				// 进行签名判断，当不是对方发送时结束发送
+				// if (!true) {
+				// break;
+				// }
 			}
 
 		} catch (Exception e) {
@@ -98,11 +113,4 @@ public class Server {
 		}
 		return "no";
 	}
-
-	private static String line(String S) {
-		if (S.length() < 6)
-			return S + "    ";
-		return S;
-	}
-
 }

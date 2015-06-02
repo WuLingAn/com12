@@ -12,7 +12,6 @@ import java.security.interfaces.RSAPublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
-import java.util.Arrays;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
@@ -21,8 +20,6 @@ import javax.crypto.NoSuchPaddingException;
 
 import org.apache.commons.lang.ArrayUtils;
 
-import jdk.nashorn.internal.ir.LiteralNode.ArrayLiteralNode.ArrayUnit;
-
 import com.sun.org.apache.xml.internal.security.exceptions.Base64DecodingException;
 import com.sun.org.apache.xml.internal.security.utils.Base64;
 
@@ -30,7 +27,7 @@ public class AddRSA {
 
 	public String strRasPublicKey;
 	public String strRsaPrivateKey;
-	RSAPublicKey rsaPublicKey;
+	public RSAPublicKey rsaPublicKey;
 	RSAPrivateKey rsaPrivateKey;
 	KeyFactory keyFactory;
 	Cipher cipher;
@@ -105,6 +102,7 @@ public class AddRSA {
 					Base64.decode(rcvKey));
 			PublicKey publicKey = keyFactory.generatePublic(x509EncodedKeySpec);
 			cipher.init(Cipher.DECRYPT_MODE, publicKey);
+			
 			result = cipher.doFinal(Base64.decode(src));
 		} catch (InvalidKeySpecException e) {
 			e.printStackTrace();
@@ -117,6 +115,6 @@ public class AddRSA {
 		} catch (Base64DecodingException e) {
 			e.printStackTrace();
 		}
-		return new String(result);
+		return Base64.encode(result);
 	}
 }

@@ -1,28 +1,45 @@
 package edu.finger.main;
 
-
-
-import edu.finger.Security.AddRSA;
 import edu.finger.Security.addAES;
-import edu.finger.Utils.Hello;
 import edu.finger.Utils.JsonHelper;
+import edu.finger.Utils.SecurityHelper;
 
 public class testMain {
 
 	public static void main(String[] args) {
-		//Gson gson=new Gson();
-		//AddRSA addRSA=new AddRSA();
-		//Hello hello=new Hello("com12",addRSA.strRasPublicKey);
-		//System.out.println(addRSA.addSecurity("zhangwei"));
-		//System.out.println(addRSA.decSecurity(addRSA.addSecurity("zhangwei"),addRSA.strRasPublicKey));
-		//System.out.println(gson.toJson(hello));
-		
-		//addAES aes=new addAES();
-		//aes.createKey();
-		//System.out.println(aes.DecryptAes(aes.addAesSecurity("zhangwei"),aes.aesKey));
-		
-		JsonHelper.sRcvToHello("{\"name\":\"finger-guessing game\",\"publicKey\":\"MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCFeGIkDI4DmvGN56FN73AggsOFGe7vusstswHaTS3Xg3RQEhW4Uu6jh4+Slx31knBLb9ChvMqrzAxDHrsT7ZgJu/nGGuRDbTL2pOIOqeGRvJ2uKzz1Ov2xVFATuHMhLXNJOA4fXgZY1HEUCmMMMYCIatXs12UaBVw3TcIvbksZ3wIDAQAB\"}");
+
+		addAES aes = new addAES();
+
+		JsonHelper.cRcvToHello(JsonHelper.sHelloToJson());
+		JsonHelper.cRcvtoPlay(JsonHelper.sPlaytoJson(1, "ccccc", aes));
+		JsonHelper.cRcvtoPassoword(JsonHelper.sPasswordtoJson(1,
+				aes.getAesKey()));
+		JsonHelper.sRcvToHello(JsonHelper.cHelloToJson());
+		JsonHelper.sRcvtoPlay(JsonHelper.cPlaytoJson(1, "3333", aes));
+		JsonHelper.sRcvtoPassoword(JsonHelper.cPasswordtoJson(1,
+				aes.getAesKey()));
+
+		/*
+		 * System.out.println(SecurityHelper.DecAll(JsonHelper.getcRcPlay()
+		 * .getPlay(), JsonHelper.getcRcvPassword().getPassword(),
+		 * JsonHelper.getcRcvHello()));
+		 */
+
+		System.out.println(JsonHelper.getsRcPlay().getPlay());
+		System.out.println(JsonHelper.getsRcvPassword().getPassword());
 		System.out.println(JsonHelper.getsRcvHello().getPublicKey());
+		System.out.println();
+		System.out.println(JsonHelper.getcRcPlay().getPlay());
+		System.out.println(JsonHelper.getcRcvPassword().getPassword());
+		System.out.println(JsonHelper.getcRcvHello().getPublicKey());
+
+		System.out.println(SecurityHelper.DecAll(JsonHelper.getcRcPlay()
+				.getPlay(), JsonHelper.getcRcvPassword().getPassword(),
+				JsonHelper.getcRcvHello().getPublicKey()));
+		System.out.println(SecurityHelper.DecAll(JsonHelper.getsRcPlay()
+				.getPlay(), JsonHelper.getsRcvPassword().getPassword(),
+				JsonHelper.getsRcvHello().getPublicKey()));
+
 	}
 
 }

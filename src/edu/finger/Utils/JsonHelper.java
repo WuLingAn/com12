@@ -1,16 +1,20 @@
 package edu.finger.Utils;
 
 import com.google.gson.Gson;
-import com.sun.org.apache.xml.internal.security.exceptions.Base64DecodingException;
-import com.sun.org.apache.xml.internal.security.utils.Base64;
 
 import edu.finger.Security.AddRSA;
+import edu.finger.Security.addAES;
 
 public class JsonHelper {
 
 	public static Gson gson = new Gson();
 	// hello阶段的数据对象
 	private static Hello sHello;
+
+	public static String aaa() {
+		return sHello.getPublicKey();
+	}
+
 	private static Hello sRcvHello;
 	private static Hello cHello;
 	private static Hello cRcvHello;
@@ -19,6 +23,12 @@ public class JsonHelper {
 	private static Play sRcvPlay;
 	private static Play cPlay;
 	private static Play cRcvPlay;
+	// 真的全用静态对象吗？
+	// password阶段的数据对象
+	private static Password sPassword;
+	private static Password cPassword;
+	private static Password sRcvPassword;
+	private static Password cRcvPassword;
 
 	public static AddRSA SaddRSA = new AddRSA();
 	public static AddRSA CaddRSA = new AddRSA();
@@ -31,13 +41,11 @@ public class JsonHelper {
 	// 解析服务器端接收到的Hello的json数据，【服务器端调用】
 	public static void sRcvToHello(String sRcvJson) {
 		sRcvHello = toHello(sRcvJson);
-		// System.out.println(sRcvHello.getPublicKey());
 	}
 
 	// 解析客户端接收到的hello的json数据，【客户端调用】
 	public static void cRcvToHello(String cRcvJson) {
 		cRcvHello = toHello(cRcvJson);
-		// System.out.println(cRcvHello.getPublicKey());
 	}
 
 	// hello阶段json数据解析
@@ -48,7 +56,6 @@ public class JsonHelper {
 	// 将服务器端要发送的hello数据进行json封装，【服务器端调用】
 	public static String sHelloToJson() {
 		sHello = new Hello("com12-S", SaddRSA.strRasPublicKey);
-		// System.out.println("shello:" + sHello.getPublicKey());
 		return gson.toJson(sHello);
 	}
 
@@ -61,38 +68,63 @@ public class JsonHelper {
 	// 解析服务器端接收到的paly的json数据，【服务器端调用】
 	public static void sRcvtoPlay(String sRcvJson) {
 		sRcvPlay = toPlay(sRcvJson);
-		//System.out.println("sRcvPlay:" + sRcvPlay.getSign());
+	}
+
+	// 解析服务器端接收到的Password的json数据，【服务器端调用】
+	public static void sRcvtoPassoword(String sRcvJson) {
+		sRcvPassword = toPassword(sRcvJson);
+	}
+
+	// 解析服务器端接收到的Password的json数据，【服务器端调用】
+	public static void cRcvtoPassoword(String sRcvJson) {
+		cRcvPassword = toPassword(sRcvJson);
 	}
 
 	// 解析客户端接收到的paly的json数据，【客户端调用】
 	public static void cRcvtoPlay(String cRcvJson) {
 		cRcvPlay = toPlay(cRcvJson);
-		// System.out.println("cRcvPlay:" + cRcvPlay.getSign());
 	}
 
 	// 将服务器端的要发送的paly数据进行json封装，【服务器端调用】
-	public static String sPlaytoJson(int roundId, String src) {
+	public static String sPlaytoJson(int roundId, String src, addAES aes) {
 		// 二次加密得到的数据
-		String playToSend = SecurityHelper.playToSend(src);
+		String playToSend = SecurityHelper.playToSend(aes, src);
 		// 三次加密后得到的数据
 		String signToSend = SecurityHelper.signToSend(playToSend);
 		sPlay = new Play(roundId, playToSend, signToSend);
 		return gson.toJson(sPlay);
 	}
 
+	// 将服务器端的要发送的Password数据进行json封装，【服务器端调用】
+	public static String sPasswordtoJson(int roundId, String pwd) {
+		sPassword = new Password(roundId, pwd);
+		return gson.toJson(sPassword);
+	}
+
 	// 将客户端要发送的play数据进行json封装，【客户端调用】
-	public static String cPlaytoJson(int roundId, String src) {
+	public static String cPlaytoJson(int roundId, String src, addAES aes) {
 		// 二次加密得到的数据
-		String playToSend = SecurityHelper.playToSend(src);
+		String playToSend = SecurityHelper.playToSend(aes, src);
 		// 三次加密后得到的数据
 		String signToSend = SecurityHelper.signToSend(playToSend);
 		cPlay = new Play(roundId, playToSend, signToSend);
 		return gson.toJson(cPlay);
 	}
 
+	// 将客户端要发送的Password数据进行json封装，【客户端调用】
+	public static String cPasswordtoJson(int roundId, String pwd) {
+		cPassword = new Password(roundId, pwd);
+		return gson.toJson(cPassword);
+	}
+
 	// Play阶段json数据的解析
 	public static Play toPlay(String json) {
 		return (Play) gson.fromJson(json, Play.class);
+	}
+
+	// password阶段json数据的解析
+	public static Password toPassword(String json) {
+		return (Password) gson.fromJson(json, Password.class);
 	}
 
 	public static Hello getsRcvHello() {
@@ -110,4 +142,21 @@ public class JsonHelper {
 	public static Play getcRcPlay() {
 		return cRcvPlay;
 	}
+
+	public static Password getsPassword() {
+		return sPassword;
+	}
+
+	public static Password getcPassword() {
+		return cPassword;
+	}
+
+	public static Password getsRcvPassword() {
+		return sRcvPassword;
+	}
+
+	public static Password getcRcvPassword() {
+		return cRcvPassword;
+	}
+
 }

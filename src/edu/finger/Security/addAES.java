@@ -16,7 +16,7 @@ public class addAES {
 	private KeyGenerator keyGenerator;
 	Cipher cipher;
 	Key key;
-	public String aesKey;
+	private String aesKey;
 
 	public addAES() {
 		try {
@@ -47,7 +47,6 @@ public class addAES {
 			// 加密
 			cipher.init(Cipher.ENCRYPT_MODE, key);
 			byte[] result = cipher.doFinal(src.getBytes());
-			//System.out.println(Base64.encode(result));
 			return Base64.encode(result);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -67,4 +66,9 @@ public class addAES {
 		}
 		return "Decrypt Error";
 	}
+	//为取出需要发送的password使用
+	public String getAesKey() {
+		return aesKey;
+	}
+	
 }
