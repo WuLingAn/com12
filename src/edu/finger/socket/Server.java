@@ -43,7 +43,7 @@ public class Server {
 			JsonHelper.sRcvToHello(info);
 			// System.out.println("hello:" + info);
 
-			for (int i = 1; i <= 5; i++) {
+			for (int i = 1; i <= 1000; i++) {
 				// 对称加密工具对象声明位置修改到这
 				addAES aes = new addAES();
 				finger = Result.outFinger1();// 服务器端的出拳放在这
@@ -55,6 +55,7 @@ public class Server {
 				// 接收c发送的play
 				info = br.readLine();
 				JsonHelper.sRcvtoPlay(info);
+				System.out.println("play"+info);
 
 				// 发送s的password
 				bw.write(JsonHelper.sPasswordtoJson(i, aes.getAesKey()));
@@ -64,9 +65,8 @@ public class Server {
 				// 接收c发送的password
 				info = br.readLine();
 				JsonHelper.sRcvtoPassoword(info);
-
 				// 尝试解密
-				System.out.println(SecurityHelper.DecAll(JsonHelper
+				System.out.println(SecurityHelper.DecAll(JsonHelper.SaddRSA,JsonHelper
 						.getsRcPlay().getPlay(), JsonHelper.getsRcvPassword()
 						.getPassword(), JsonHelper.getsRcvHello()
 						.getPublicKey()));

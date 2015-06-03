@@ -92,7 +92,6 @@ public class AddRSA {
 			e.printStackTrace();
 		}
 		return Base64.encode(result);
-		// return result;
 	}
 
 	public String decSecurity(String src, String rcvKey) {
@@ -102,7 +101,6 @@ public class AddRSA {
 					Base64.decode(rcvKey));
 			PublicKey publicKey = keyFactory.generatePublic(x509EncodedKeySpec);
 			cipher.init(Cipher.DECRYPT_MODE, publicKey);
-			
 			result = cipher.doFinal(Base64.decode(src));
 		} catch (InvalidKeySpecException e) {
 			e.printStackTrace();
@@ -115,6 +113,7 @@ public class AddRSA {
 		} catch (Base64DecodingException e) {
 			e.printStackTrace();
 		}
+		//System.out.println(Base64.encode(result));
 		return Base64.encode(result);
 	}
 }

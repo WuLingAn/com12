@@ -46,9 +46,10 @@ public class Client {
 			// 得到存入cRcvHello
 			JsonHelper.cRcvToHello(info);
 
-			for (int i = 1; i <= 5; i++) {
+			for (int i = 1; i <= 1000; i++) {
 				addAES aes=new addAES();
 				finger = Result.outFinger2();
+//				System.out.println(finger);
 				// 从s得到play数据
 				info = br.readLine();
 				// 得到存入cRcvtoPlay
@@ -68,7 +69,7 @@ public class Client {
 				bw.newLine();
 				bw.flush();
 				
-				System.out.println(SecurityHelper.DecAll(JsonHelper.getcRcPlay()
+				System.out.println(SecurityHelper.DecAll(JsonHelper.CaddRSA,JsonHelper.getcRcPlay()
 						.getPlay(), JsonHelper.getcRcvPassword().getPassword(),
 						JsonHelper.getcRcvHello().getPublicKey()));
 			}
