@@ -57,6 +57,7 @@ public class addAES {
 	public String DecryptAes(String src, String StrKey) {
 		try {
 			// 解密
+			//System.out.println(StrKey+":"+src);
 			Key key = new SecretKeySpec(Base64.decode(StrKey), "AES");
 			cipher.init(Cipher.DECRYPT_MODE, key);
 			byte[] result = cipher.doFinal(Base64.decode(src));

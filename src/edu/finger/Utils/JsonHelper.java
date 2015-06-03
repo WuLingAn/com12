@@ -88,9 +88,9 @@ public class JsonHelper {
 	// 将服务器端的要发送的paly数据进行json封装，【服务器端调用】
 	public static String sPlaytoJson(int roundId, String src, addAES aes) {
 		// 二次加密得到的数据
-		String playToSend = SecurityHelper.playToSend(aes, src);
+		String playToSend = SecurityHelper.playToSend(SaddRSA,aes, src);
 		// 三次加密后得到的数据
-		String signToSend = SecurityHelper.signToSend(playToSend);
+		String signToSend = SecurityHelper.signToSend(SaddRSA,playToSend);
 		sPlay = new Play(roundId, playToSend, signToSend);
 		return gson.toJson(sPlay);
 	}
@@ -104,9 +104,9 @@ public class JsonHelper {
 	// 将客户端要发送的play数据进行json封装，【客户端调用】
 	public static String cPlaytoJson(int roundId, String src, addAES aes) {
 		// 二次加密得到的数据
-		String playToSend = SecurityHelper.playToSend(aes, src);
+		String playToSend = SecurityHelper.playToSend(CaddRSA,aes, src);
 		// 三次加密后得到的数据
-		String signToSend = SecurityHelper.signToSend(playToSend);
+		String signToSend = SecurityHelper.signToSend(CaddRSA,playToSend);
 		cPlay = new Play(roundId, playToSend, signToSend);
 		return gson.toJson(cPlay);
 	}

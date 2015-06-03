@@ -2,7 +2,6 @@ package edu.finger.main;
 
 import edu.finger.Security.addAES;
 import edu.finger.Utils.JsonHelper;
-import edu.finger.Utils.SecurityHelper;
 
 public class testMain {
 
@@ -33,12 +32,12 @@ public class testMain {
 		System.out.println(JsonHelper.getcRcvPassword().getPassword());
 		System.out.println(JsonHelper.getcRcvHello().getPublicKey());
 
-		System.out.println(SecurityHelper.DecAll(JsonHelper.getcRcPlay()
-				.getPlay(), JsonHelper.getcRcvPassword().getPassword(),
-				JsonHelper.getcRcvHello().getPublicKey()));
-		System.out.println(SecurityHelper.DecAll(JsonHelper.getsRcPlay()
-				.getPlay(), JsonHelper.getsRcvPassword().getPassword(),
-				JsonHelper.getsRcvHello().getPublicKey()));
+//		System.out.println(SecurityHelper.DecAll(JsonHelper.getcRcPlay()
+//				.getPlay(), JsonHelper.getcRcvPassword().getPassword(),
+//				JsonHelper.getcRcvHello().getPublicKey()));
+//		System.out.println(SecurityHelper.DecAll(JsonHelper.getsRcPlay()
+//				.getPlay(), JsonHelper.getsRcvPassword().getPassword(),
+//				JsonHelper.getsRcvHello().getPublicKey()));
 
 	}
 
