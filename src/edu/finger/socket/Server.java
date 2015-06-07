@@ -12,10 +12,12 @@ import java.net.Socket;
 
 import edu.finger.Security.addAES;
 import edu.finger.Utils.JsonHelper;
+import edu.finger.Utils.JudgeUtil;
 import edu.finger.Utils.Result;
 import edu.finger.Utils.SecurityHelper;
 
 public class Server {
+
 	public static void main(String[] args) {
 		ServerSocket serverSocket = null;
 		InputStream is = null;
@@ -24,7 +26,9 @@ public class Server {
 		BufferedReader br = null;
 		BufferedWriter bw = null;
 		String finger = null;
-
+		String fingerFromOpposite = null;
+		String result = null;
+		int j=0;
 		try {
 			serverSocket = new ServerSocket(9000);
 			Socket socket = serverSocket.accept();
@@ -55,7 +59,7 @@ public class Server {
 				// 接收c发送的play
 				info = br.readLine();
 				JsonHelper.sRcvtoPlay(info);
-				System.out.println("play"+info);
+				//System.out.println("play" + info);
 
 				// 发送s的password
 				bw.write(JsonHelper.sPasswordtoJson(i, aes.getAesKey()));
@@ -65,20 +69,25 @@ public class Server {
 				// 接收c发送的password
 				info = br.readLine();
 				JsonHelper.sRcvtoPassoword(info);
-				// 尝试解密
-				System.out.println(SecurityHelper.DecAll(JsonHelper.SaddRSA,JsonHelper
-						.getsRcPlay().getPlay(), JsonHelper.getsRcvPassword()
-						.getPassword(), JsonHelper.getsRcvHello()
-						.getPublicKey()));
+				// 解密对方发送的出拳
+				fingerFromOpposite = SecurityHelper.DecAll(JsonHelper.SaddRSA,
+						JsonHelper.getsRcPlay().getPlay(), JsonHelper
+								.getsRcvPassword().getPassword(), JsonHelper
+								.getsRcvHello().getPublicKey());
+				// 判断这局的胜负
+				result = JudgeUtil.judeg(finger, fingerFromOpposite);
+//				System.out.println(finger + "-->" + fingerFromOpposite + ":"
+//						+ result);
+				if("赢了".equals(result)) j++;
 				// 进行签名判断，当不是对方发送时结束发送
 				// if (!true) {
 				// break;
 				// }
 			}
-
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
+			System.out.println("一共赢了："+j+"局");
 			try {
 				os.close();
 				is.close();
@@ -88,29 +97,5 @@ public class Server {
 				e.printStackTrace();
 			}
 		}
-	}
-
-	public static String com(String finger, String info) {
-		if (finger.equals(info))
-			return "平局";
-		if ("Paper".equals(finger)) {
-			if ("Rock".equals(info))
-				return "赢了";
-			else if ("Scissors".equals(info))
-				return "输了";
-		}
-		if ("Rock".equals(finger)) {
-			if ("Scissors".equals(info))
-				return "赢了";
-			else if ("Paper".equals(info))
-				return "输了";
-		}
-		if ("Scissors".equals(finger)) {
-			if ("Paper".equals(info))
-				return "赢了";
-			else if ("Rock".equals(info))
-				return "输了";
-		}
-		return "no";
 	}
 }

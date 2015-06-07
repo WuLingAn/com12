@@ -12,10 +12,13 @@ import java.net.UnknownHostException;
 
 import edu.finger.Security.addAES;
 import edu.finger.Utils.JsonHelper;
+import edu.finger.Utils.JudgeUtil;
 import edu.finger.Utils.Result;
 import edu.finger.Utils.SecurityHelper;
+
 /**
  * now ,现在想一想我们得到的play信息和password信息怎么保存和处理
+ * 
  * @author zLing
  *
  */
@@ -29,7 +32,10 @@ public class Client {
 		BufferedWriter bw = null;
 		String info = null;
 		String finger = null;
+		String fingerFromOpposite = null;
+		String result=null;
 		Socket socket = null;
+		int j=0;
 		try {
 			socket = new Socket("localhost", 9000);
 			os = socket.getOutputStream();
@@ -47,9 +53,9 @@ public class Client {
 			JsonHelper.cRcvToHello(info);
 
 			for (int i = 1; i <= 1000; i++) {
-				addAES aes=new addAES();
+				addAES aes = new addAES();
 				finger = Result.outFinger2();
-//				System.out.println(finger);
+				// System.out.println(finger);
 				// 从s得到play数据
 				info = br.readLine();
 				// 得到存入cRcvtoPlay
@@ -57,28 +63,34 @@ public class Client {
 				// 进行签名判断，确定是否是对方发送的数据包
 				if (true) {
 					// 发送c的play
-					bw.write(JsonHelper.cPlaytoJson(i, finger,aes));
+					bw.write(JsonHelper.cPlaytoJson(i, finger, aes));
 					bw.newLine();
 					bw.flush();
 				}
-				//得到s的password
+				// 得到s的password
 				info = br.readLine();
 				JsonHelper.cRcvtoPassoword(info);
-				//发送c的password
+				// 发送c的password
 				bw.write(JsonHelper.cPasswordtoJson(i, aes.getAesKey()));
 				bw.newLine();
 				bw.flush();
-				
-				System.out.println(SecurityHelper.DecAll(JsonHelper.CaddRSA,JsonHelper.getcRcPlay()
-						.getPlay(), JsonHelper.getcRcvPassword().getPassword(),
-						JsonHelper.getcRcvHello().getPublicKey()));
+				// 解密从对方发送的数据
+				fingerFromOpposite = SecurityHelper.DecAll(JsonHelper.CaddRSA,
+						JsonHelper.getcRcPlay().getPlay(), JsonHelper
+								.getcRcvPassword().getPassword(), JsonHelper
+								.getcRcvHello().getPublicKey());
+				// 对当前局进行判断
+				result=JudgeUtil.judeg(finger, fingerFromOpposite);
+//				System.out.println(finger + "-->" + fingerFromOpposite + ":"
+//						+ result);
+				if("输了".equals(result)) j++;
 			}
-
 		} catch (UnknownHostException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
 		} finally {
+			System.out.println("一共输了："+j+"局");
 			try {
 				socket.close();
 				os.close();

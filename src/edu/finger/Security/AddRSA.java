@@ -52,8 +52,6 @@ public class AddRSA {
 
 			strRasPublicKey = Base64.encode(rsaPublicKey.getEncoded());
 			strRsaPrivateKey = Base64.encode(rsaPrivateKey.getEncoded());
-			// System.out.println("Public Key:" + strRasPublicKey);
-			// System.out.println("Private Key:" + strRsaPrivateKey);
 
 		} catch (NoSuchAlgorithmException e) {
 			e.printStackTrace();
@@ -113,7 +111,6 @@ public class AddRSA {
 		} catch (Base64DecodingException e) {
 			e.printStackTrace();
 		}
-		//System.out.println(Base64.encode(result));
 		return Base64.encode(result);
 	}
 }
