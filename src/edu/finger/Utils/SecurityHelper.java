@@ -13,17 +13,17 @@ public class SecurityHelper {
 	
 	// AES加密,为了能取出对称密钥，改变aes的声明位置
 	public static String useAES(addAES aes, String src) {
-		// addAES aes = new addAES();
 		return aes.addAesSecurity(src);
 	}
 
 	// 调用两次加密
-	public static String playToSend(AddRSA rsa,addAES aes, String src) {
-		return useRSA(rsa,useAES(aes, src));
+	public static String playToSend(addAES aes, String src) {
+		return useAES(aes, src);
 	}
 
 	// 对加密后的加密得到sign
 	public static String signToSend(AddRSA rsa,String toSendPlay) {
+		
 		return useRSA(rsa,toSendPlay);
 	}
 	
@@ -37,8 +37,10 @@ public class SecurityHelper {
 		return aesForDec.DecryptAes(src, key);
 	}
 
-	// 解密方法组装机器
+	// 解密方法组装机器,重新设计，加入签名判断
 	public static String DecAll(AddRSA rsa,String get, String key, String helloPublicKey) {
-		return DecAES(DecRSA(rsa,get, helloPublicKey), key);
+		
+		
+		return DecAES(get, key);
 	}
 }

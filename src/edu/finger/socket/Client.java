@@ -11,31 +11,33 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 
 import edu.finger.Security.addAES;
+import edu.finger.Utils.Context;
+import edu.finger.Utils.FileTool;
 import edu.finger.Utils.JsonHelper;
 import edu.finger.Utils.JudgeUtil;
 import edu.finger.Utils.Result;
 import edu.finger.Utils.SecurityHelper;
 
 /**
- * now ,现在想一想我们得到的play信息和password信息怎么保存和处理
- * 
- * @author zLing
+ * @author zLing & Fang-SQ
  *
  */
 public class Client {
 
 	public static void main(String[] args) {
 		OutputStream os = null;
-		// PrintWriter pw = null;
 		InputStream is = null;
 		BufferedReader br = null;
 		BufferedWriter bw = null;
 		String info = null;
 		String finger = null;
 		String fingerFromOpposite = null;
-		String result=null;
+		String result = null;
 		Socket socket = null;
-		int j=0;
+		int j = 0;
+		int k = 0;
+		FileTool fileTool = new FileTool();
+		int msgType = -1;
 		try {
 			socket = new Socket("localhost", 9000);
 			os = socket.getOutputStream();
@@ -44,10 +46,9 @@ public class Client {
 			br = new BufferedReader(new InputStreamReader(is));
 
 			// 发送c的hello
-			bw.write(JsonHelper.cHelloToJson());
-			bw.newLine();
-			bw.flush();
+			packageToSend(Context.MSG_TYPE_HELLO, bw, JsonHelper.cHelloToJson());
 			// 得到s的hello
+			msgType = br.read();
 			info = br.readLine();
 			// 得到存入cRcvHello
 			JsonHelper.cRcvToHello(info);
@@ -55,42 +56,41 @@ public class Client {
 			for (int i = 1; i <= 1000; i++) {
 				addAES aes = new addAES();
 				finger = Result.outFinger2();
-				// System.out.println(finger);
 				// 从s得到play数据
+				msgType = br.read();
 				info = br.readLine();
 				// 得到存入cRcvtoPlay
 				JsonHelper.cRcvtoPlay(info);
 				// 进行签名判断，确定是否是对方发送的数据包
-				if (true) {
-					// 发送c的play
-					bw.write(JsonHelper.cPlaytoJson(i, finger, aes));
-					bw.newLine();
-					bw.flush();
-				}
+				// 发送c的play
+				packageToSend(Context.MSG_TYPE_PLAY, bw,
+						JsonHelper.cPlaytoJson(i, finger, aes));
 				// 得到s的password
+				msgType = br.read();
 				info = br.readLine();
 				JsonHelper.cRcvtoPassoword(info);
 				// 发送c的password
-				bw.write(JsonHelper.cPasswordtoJson(i, aes.getAesKey()));
-				bw.newLine();
-				bw.flush();
+				packageToSend(Context.MSG_TYPE_PASSWORD, bw, JsonHelper.cPasswordtoJson(i, aes.getAesKey()));
 				// 解密从对方发送的数据
 				fingerFromOpposite = SecurityHelper.DecAll(JsonHelper.CaddRSA,
 						JsonHelper.getcRcPlay().getPlay(), JsonHelper
 								.getcRcvPassword().getPassword(), JsonHelper
 								.getcRcvHello().getPublicKey());
 				// 对当前局进行判断
-				result=JudgeUtil.judeg(finger, fingerFromOpposite);
-//				System.out.println(finger + "-->" + fingerFromOpposite + ":"
-//						+ result);
-				if("输了".equals(result)) j++;
+				result = JudgeUtil.judeg(finger, fingerFromOpposite);
+				if ("赢了".equals(result))
+					j++;
+				if ("平局".equals(result))
+					k++;
 			}
 		} catch (UnknownHostException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
 		} finally {
-			System.out.println("一共输了："+j+"局");
+			System.out.println("一共输了：" + j + "局");
+			System.out.println("一共平了：" + k + "局");
+			System.out.println("平局：" + (k * 1 + (1000 - j - k) * 3) + "分");
 			try {
 				socket.close();
 				os.close();
@@ -101,5 +101,23 @@ public class Client {
 				e.printStackTrace();
 			}
 		}
+	}
+
+	/**
+	 * 发送消息的打包方法
+	 * 
+	 * @param msgType
+	 *            发送信息的类型 0,1,2
+	 * @param bw
+	 *            写用
+	 * @param msgToJson
+	 *            要发送的Json信息
+	 */
+	private static void packageToSend(int msgType, BufferedWriter bw,
+			String msgToJson) throws IOException {
+		bw.write(msgType);
+		bw.write(msgToJson);
+		bw.newLine();
+		bw.flush();
 	}
 }

@@ -18,8 +18,6 @@ import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 
-import org.apache.commons.lang.ArrayUtils;
-
 import com.sun.org.apache.xml.internal.security.exceptions.Base64DecodingException;
 import com.sun.org.apache.xml.internal.security.utils.Base64;
 
@@ -60,7 +58,6 @@ public class AddRSA {
 
 	public String addSecurity(String src) {
 		byte[] result =null;
-		byte[] temp=null;
 		try {
 			PKCS8EncodedKeySpec pkcs8EncodedKeySpec = new PKCS8EncodedKeySpec(
 					rsaPrivateKey.getEncoded());
@@ -68,16 +65,8 @@ public class AddRSA {
 					.generatePrivate(pkcs8EncodedKeySpec);
 			cipher = Cipher.getInstance("RSA");
 			cipher.init(Cipher.ENCRYPT_MODE, privateKey);
-			int length=Base64.decode(src).length;
 			//加密前先进行判断需要加密的数组的长度
-			if(length<117){
-				result = cipher.doFinal(Base64.decode(src));
-			}else{
-				for(int i=0;i<length;i+=100){
-					temp=cipher.doFinal(ArrayUtils.subarray(Base64.decode(src), i, i+100));
-					result=ArrayUtils.addAll(result, temp);
-				}
-			}
+			result = cipher.doFinal(Base64.decode(src));
 		} catch (NoSuchAlgorithmException e) {
 			e.printStackTrace();
 		} catch (InvalidKeySpecException e) {
@@ -89,7 +78,10 @@ public class AddRSA {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		return Base64.encode(result);
+		//System.out.println("--"+java.util.Base64.getEncoder().encodeToString(result));
+		//System.out.println("++"+Base64.encode(result));
+		//return Base64.encode(result);
+		return java.util.Base64.getEncoder().encodeToString(result);
 	}
 
 	public String decSecurity(String src, String rcvKey) {

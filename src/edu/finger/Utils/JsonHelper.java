@@ -1,13 +1,14 @@
 package edu.finger.Utils;
 
-import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import edu.finger.Security.AddRSA;
 import edu.finger.Security.addAES;
 
 public class JsonHelper {
-
-	public static Gson gson = new Gson();
+	
+	public static GsonBuilder gson = new GsonBuilder();
+	
 	// hello阶段的数据对象
 	private static Hello sHello;
 	private static Hello sRcvHello;
@@ -40,21 +41,22 @@ public class JsonHelper {
 
 	// hello阶段json数据解析
 	public static Hello toHello(String json) {
-		return (Hello) gson.fromJson(json, Hello.class);
+		return (Hello) gson.create().fromJson(json, Hello.class);
 	}
 
 	// 将服务器端要发送的hello数据进行json封装，【服务器端调用】
 	public static String sHelloToJson() {
+		gson.disableHtmlEscaping();
 		SaddRSA = new AddRSA();
 		sHello = new Hello("com12-S", SaddRSA.strRasPublicKey);
-		return gson.toJson(sHello);
+		return gson.create().toJson(sHello);
 	}
 
 	// 将客户端要发送的hello数据进行json数据封装，【客户端调用】
 	public static String cHelloToJson() {
 		CaddRSA = new AddRSA();
 		cHello = new Hello("com12-C", CaddRSA.strRasPublicKey);
-		return gson.toJson(cHello);
+		return gson.create().toJson(cHello);
 	}
 
 	// 解析服务器端接收到的paly的json数据，【服务器端调用】
@@ -79,44 +81,44 @@ public class JsonHelper {
 
 	// 将服务器端的要发送的paly数据进行json封装，【服务器端调用】
 	public static String sPlaytoJson(int roundId, String src, addAES aes) {
-		// 二次加密得到的数据
-		String playToSend = SecurityHelper.playToSend(SaddRSA,aes, src);
-		// 三次加密后得到的数据
+		// 一次加密得到的数据
+		String playToSend = SecurityHelper.playToSend(aes, src);
+		// 二次加密后得到的数据
 		String signToSend = SecurityHelper.signToSend(SaddRSA,playToSend);
 		sPlay = new Play(roundId, playToSend, signToSend);
-		return gson.toJson(sPlay);
+		return gson.create().toJson(sPlay);
 	}
 
 	// 将客户端要发送的play数据进行json封装，【客户端调用】
 	public static String cPlaytoJson(int roundId, String src, addAES aes) {
 		// 二次加密得到的数据
-		String playToSend = SecurityHelper.playToSend(CaddRSA,aes, src);
+		String playToSend = SecurityHelper.playToSend(aes, src);
 		// 三次加密后得到的数据
 		String signToSend = SecurityHelper.signToSend(CaddRSA,playToSend);
 		cPlay = new Play(roundId, playToSend, signToSend);
-		return gson.toJson(cPlay);
+		return gson.create().toJson(cPlay);
 	}
 
 	// 将服务器端的要发送的Password数据进行json封装，【服务器端调用】
 	public static String sPasswordtoJson(int roundId, String pwd) {
 		sPassword = new Password(roundId, pwd);
-		return gson.toJson(sPassword);
+		return gson.create().toJson(sPassword);
 	}
 
 	// 将客户端要发送的Password数据进行json封装，【客户端调用】
 	public static String cPasswordtoJson(int roundId, String pwd) {
 		cPassword = new Password(roundId, pwd);
-		return gson.toJson(cPassword);
+		return gson.create().toJson(cPassword);
 	}
 
 	// Play阶段json数据的解析
 	public static Play toPlay(String json) {
-		return (Play) gson.fromJson(json, Play.class);
+		return (Play) gson.create().fromJson(json, Play.class);
 	}
 
 	// password阶段json数据的解析
 	public static Password toPassword(String json) {
-		return (Password) gson.fromJson(json, Password.class);
+		return (Password) gson.create().fromJson(json, Password.class);
 	}
 
 	public static Hello getsRcvHello() {

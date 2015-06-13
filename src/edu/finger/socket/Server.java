@@ -11,11 +11,17 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 import edu.finger.Security.addAES;
+import edu.finger.Utils.Context;
+import edu.finger.Utils.FileTool;
 import edu.finger.Utils.JsonHelper;
 import edu.finger.Utils.JudgeUtil;
 import edu.finger.Utils.Result;
 import edu.finger.Utils.SecurityHelper;
-
+/**
+ * 
+ * @author zLing & Fang-SQ
+ *
+ */
 public class Server {
 
 	public static void main(String[] args) {
@@ -28,7 +34,10 @@ public class Server {
 		String finger = null;
 		String fingerFromOpposite = null;
 		String result = null;
-		int j=0;
+		int j = 0;
+		int k = 0;
+		int msgType = -1;
+		FileTool fileTool = new FileTool();
 		try {
 			serverSocket = new ServerSocket(9000);
 			Socket socket = serverSocket.accept();
@@ -39,10 +48,9 @@ public class Server {
 			br = new BufferedReader(new InputStreamReader(is));
 
 			// 发送s的hello
-			bw.write(JsonHelper.sHelloToJson());
-			bw.newLine();
-			bw.flush();
+			packageToSend(Context.MSG_TYPE_HELLO, bw, JsonHelper.sHelloToJson());
 
+			msgType = br.read();
 			info = br.readLine();
 			JsonHelper.sRcvToHello(info);
 			// System.out.println("hello:" + info);
@@ -52,21 +60,20 @@ public class Server {
 				addAES aes = new addAES();
 				finger = Result.outFinger1();// 服务器端的出拳放在这
 				// 发送s的play
-				bw.write(JsonHelper.sPlaytoJson(i, finger, aes));
-				bw.newLine();
-				bw.flush();
+				packageToSend(Context.MSG_TYPE_PLAY, bw,
+						JsonHelper.sPlaytoJson(i, finger, aes));
 
 				// 接收c发送的play
+				msgType = br.read();
 				info = br.readLine();
 				JsonHelper.sRcvtoPlay(info);
-				//System.out.println("play" + info);
 
 				// 发送s的password
-				bw.write(JsonHelper.sPasswordtoJson(i, aes.getAesKey()));
-				bw.newLine();
-				bw.flush();
+				packageToSend(Context.MSG_TYPE_PASSWORD, bw,
+						JsonHelper.sPasswordtoJson(i, aes.getAesKey()));
 
 				// 接收c发送的password
+				msgType = br.read();
 				info = br.readLine();
 				JsonHelper.sRcvtoPassoword(info);
 				// 解密对方发送的出拳
@@ -76,18 +83,17 @@ public class Server {
 								.getsRcvHello().getPublicKey());
 				// 判断这局的胜负
 				result = JudgeUtil.judeg(finger, fingerFromOpposite);
-//				System.out.println(finger + "-->" + fingerFromOpposite + ":"
-//						+ result);
-				if("赢了".equals(result)) j++;
-				// 进行签名判断，当不是对方发送时结束发送
-				// if (!true) {
-				// break;
-				// }
+				if ("赢了".equals(result))
+					j++;
+				if ("平局".equals(result))
+					k++;
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
-			System.out.println("一共赢了："+j+"局");
+			System.out.println("一共赢了：" + j + "局");
+			System.out.println("一共平了：" + k + "局");
+			System.out.println("共：" + (j * 3 + k * 1) + "分");
 			try {
 				os.close();
 				is.close();
@@ -97,5 +103,23 @@ public class Server {
 				e.printStackTrace();
 			}
 		}
+	}
+
+	/**
+	 * 发送消息的打包方法
+	 * 
+	 * @param msgType
+	 *            发送信息的类型 0,1,2
+	 * @param bw
+	 *            写用
+	 * @param msgToJson
+	 *            要发送的Json信息
+	 */
+	private static void packageToSend(int msgType, BufferedWriter bw,
+			String msgToJson) throws IOException {
+		bw.write(msgType);
+		bw.write(msgToJson);
+		bw.newLine();
+		bw.flush();
 	}
 }
