@@ -6,9 +6,9 @@ import edu.finger.Security.AddRSA;
 import edu.finger.Security.addAES;
 
 public class JsonHelper {
-	
+
 	public static GsonBuilder gson = new GsonBuilder();
-	
+
 	// hello阶段的数据对象
 	private static Hello sHello;
 	private static Hello sRcvHello;
@@ -54,19 +54,36 @@ public class JsonHelper {
 
 	// 将客户端要发送的hello数据进行json数据封装，【客户端调用】
 	public static String cHelloToJson() {
+		gson.disableHtmlEscaping();
 		CaddRSA = new AddRSA();
 		cHello = new Hello("com12-C", CaddRSA.strRasPublicKey);
 		return gson.create().toJson(cHello);
 	}
 
 	// 解析服务器端接收到的paly的json数据，【服务器端调用】
-	public static void sRcvtoPlay(String sRcvJson) {
+	public static boolean sRcvtoPlay(String sRcvJson) {
 		sRcvPlay = toPlay(sRcvJson);
+		String ming = sRcvPlay.getPlay();
+		String mi = sRcvPlay.getSign();
+		if (SecurityHelper.DecRSA(SaddRSA, mi, sRcvHello.getPublicKey())
+				.equals(ming)) {
+			return true;
+		}
+		System.out.println("error sign 不匹配");
+		return false;
 	}
 
 	// 解析客户端接收到的paly的json数据，【客户端调用】
-	public static void cRcvtoPlay(String cRcvJson) {
+	public static boolean cRcvtoPlay(String cRcvJson) {
 		cRcvPlay = toPlay(cRcvJson);
+		String ming = cRcvPlay.getPlay();
+		String mi = cRcvPlay.getSign();
+		if (ming.equals(SecurityHelper.DecRSA(CaddRSA, mi,
+				cRcvHello.getPublicKey()))) {
+			return true;
+		}
+		System.out.println("error sign 不匹配");
+		return false;
 	}
 
 	// 解析服务器端接收到的Password的json数据，【服务器端调用】
@@ -84,7 +101,7 @@ public class JsonHelper {
 		// 一次加密得到的数据
 		String playToSend = SecurityHelper.playToSend(aes, src);
 		// 二次加密后得到的数据
-		String signToSend = SecurityHelper.signToSend(SaddRSA,playToSend);
+		String signToSend = SecurityHelper.signToSend(SaddRSA, playToSend);
 		sPlay = new Play(roundId, playToSend, signToSend);
 		return gson.create().toJson(sPlay);
 	}
@@ -94,7 +111,7 @@ public class JsonHelper {
 		// 二次加密得到的数据
 		String playToSend = SecurityHelper.playToSend(aes, src);
 		// 三次加密后得到的数据
-		String signToSend = SecurityHelper.signToSend(CaddRSA,playToSend);
+		String signToSend = SecurityHelper.signToSend(CaddRSA, playToSend);
 		cPlay = new Play(roundId, playToSend, signToSend);
 		return gson.create().toJson(cPlay);
 	}

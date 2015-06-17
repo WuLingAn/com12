@@ -36,7 +36,10 @@ public class Client {
 		Socket socket = null;
 		int j = 0;
 		int k = 0;
-		FileTool fileTool = new FileTool();
+		int sum_p = 0;
+		int sum_r = 0;
+		int sum_s = 0;
+		FileTool fileTool = new FileTool("G:\\client.log");
 		int msgType = -1;
 		try {
 			socket = new Socket("localhost", 9000);
@@ -51,16 +54,16 @@ public class Client {
 			msgType = br.read();
 			info = br.readLine();
 			// 得到存入cRcvHello
-			JsonHelper.cRcvToHello(info);
+			getMsg(msgType, info);
 
 			for (int i = 1; i <= 1000; i++) {
 				addAES aes = new addAES();
-				finger = Result.outFinger2();
+				finger = Result.outFinger2(sum_p, sum_r, sum_s);
 				// 从s得到play数据
 				msgType = br.read();
 				info = br.readLine();
 				// 得到存入cRcvtoPlay
-				JsonHelper.cRcvtoPlay(info);
+				getMsg(msgType, info);
 				// 进行签名判断，确定是否是对方发送的数据包
 				// 发送c的play
 				packageToSend(Context.MSG_TYPE_PLAY, bw,
@@ -68,7 +71,7 @@ public class Client {
 				// 得到s的password
 				msgType = br.read();
 				info = br.readLine();
-				JsonHelper.cRcvtoPassoword(info);
+				getMsg(msgType, info);
 				// 发送c的password
 				packageToSend(Context.MSG_TYPE_PASSWORD, bw, JsonHelper.cPasswordtoJson(i, aes.getAesKey()));
 				// 解密从对方发送的数据
@@ -76,21 +79,42 @@ public class Client {
 						JsonHelper.getcRcPlay().getPlay(), JsonHelper
 								.getcRcvPassword().getPassword(), JsonHelper
 								.getcRcvHello().getPublicKey());
+				switch (fingerFromOpposite) {
+				case "Paper":
+					sum_p++;
+					break;
+				case "Rock":
+					sum_r++;
+					break;
+				case "Scissors":
+					sum_s++;
+					break;
+				}
 				// 对当前局进行判断
 				result = JudgeUtil.judeg(finger, fingerFromOpposite);
 				if ("赢了".equals(result))
 					j++;
-				if ("平局".equals(result))
+				if ("输了".equals(result))
 					k++;
+				fileTool.savedToText("round:" + i + ": " + "get paly:"
+						+ JsonHelper.getcRcPlay().getPlay() + " get sign:"
+						+ JsonHelper.getcRcPlay().getSign() + " get finger:"
+						+ fingerFromOpposite + " my finger:" + finger
+						+ " result:" + result);
 			}
 		} catch (UnknownHostException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
 		} finally {
-			System.out.println("一共输了：" + j + "局");
-			System.out.println("一共平了：" + k + "局");
-			System.out.println("平局：" + (k * 1 + (1000 - j - k) * 3) + "分");
+			if (j > k) {
+				System.out.println("胜利^.^");
+				System.out.println("一共赢了：" + j + "局");
+			} else {
+				System.out.println("失败-_-");
+				System.out.println("一共赢了：" + j + "局");
+			}
+			// System.out.println("共：" + (j * 3 + k * 1) + "分");
 			try {
 				socket.close();
 				os.close();
@@ -119,5 +143,19 @@ public class Client {
 		bw.write(msgToJson);
 		bw.newLine();
 		bw.flush();
+	}
+	
+	private static boolean getMsg(int msgType, String info) {
+		switch (msgType) {
+		case 0:
+			JsonHelper.cRcvToHello(info);
+			break;
+		case 1:
+			return JsonHelper.cRcvtoPlay(info);
+		case 2:
+			JsonHelper.cRcvtoPassoword(info);
+			break;
+		}
+		return true;
 	}
 }

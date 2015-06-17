@@ -33,8 +33,12 @@ public class AddRSA {
 	public AddRSA() {
 		try {
 			keyFactory = KeyFactory.getInstance("RSA");
+			cipher = Cipher.getInstance("RSA");
 			createKey();
 		} catch (NoSuchAlgorithmException e) {
+			e.printStackTrace();
+		} catch (NoSuchPaddingException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -63,15 +67,11 @@ public class AddRSA {
 					rsaPrivateKey.getEncoded());
 			PrivateKey privateKey = keyFactory
 					.generatePrivate(pkcs8EncodedKeySpec);
-			cipher = Cipher.getInstance("RSA");
+			//cipher = Cipher.getInstance("RSA");
 			cipher.init(Cipher.ENCRYPT_MODE, privateKey);
 			//加密前先进行判断需要加密的数组的长度
 			result = cipher.doFinal(Base64.decode(src));
-		} catch (NoSuchAlgorithmException e) {
-			e.printStackTrace();
 		} catch (InvalidKeySpecException e) {
-			e.printStackTrace();
-		} catch (NoSuchPaddingException e) {
 			e.printStackTrace();
 		} catch (InvalidKeyException e) {
 			e.printStackTrace();

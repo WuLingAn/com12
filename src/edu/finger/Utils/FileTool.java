@@ -11,8 +11,17 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 
 public class FileTool {
-	public void savedToText(String fileName, String StringToWrite) {
-		File targetFile = new File(fileName);
+	File targetFile;
+	
+	public FileTool(String fileName) {
+		targetFile = new File(fileName);
+		if(targetFile.exists()){
+			targetFile.delete();
+		}
+		
+	}
+	public void savedToText(String StringToWrite) {
+		
 		OutputStreamWriter osw = null;
 
 		try {
